@@ -1,0 +1,38 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+      # 第三步：执行构建命令
+      # 这就是您文档中提供的构建命令，我们直接使用它
+    - name: Build the application
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -extldflags '-static'" -o pansou .
+
+      # 第四步：上传构建产物（Artifact）
+      # 这是回答您“是否会输出构建的文件”的关键步骤
+      # 它会将生成的可执行文件 pansou 打包并上传
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        # 上传的产物名称，您可以在下载时看到这个名字
+        name: pansou-linux-amd64
+        # 要上传的文件的路径，这里是当前目录下的 pansou 文件
+        path: pansou
